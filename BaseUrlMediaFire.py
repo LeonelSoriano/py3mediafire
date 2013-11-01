@@ -73,7 +73,7 @@ class BaseUrlMediaFire(object):
 
 	GET_CONTENT_FOLDER = 'http://www.mediafire.com/api/folder/get_content.php'
 
-	#Checks if instant upload is possible and checks if a duplicate filename exists in the
+	#Checks if instant uploads is possible and checks if a duplicate filename exists in the
 	#destination folder. This returns a 'quickkey' on a successful instant upload, or 2 data values:
 	#'new_hash' and 'duplicate_name' which can be 'yes' or 'no'. Based on those values, the
 	#uploader performs a regular upload, or resends the same pre_upload request with 
