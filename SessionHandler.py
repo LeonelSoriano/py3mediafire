@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # -*- Mode: Python; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- #
+import time
 import hashlib
 from urllib.request import urlopen
 import urllib.parse
@@ -17,7 +18,16 @@ class SessionHandler(WapperUrl):
 		self.__api_key = api_key
 		self.signature = self.__email + self.__password + self.__application_id + api_key
 		self.sha1_encode = hashlib.sha1(self.signature.encode()).hexdigest()
+		self.expires_session = 0
+		self.token_session = self.__user_getSessionToken()
+		print(self.expires_session)
 
+	def __user_getSessionToken(self):
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_SESSION_TOKEN_USER,
+			{'email': self.__email, 'password': self.__password, 'application_id': self.__application_id,
+			'signature': self.sha1_encode, 'version': self.__version})
+		self.expires_session = int(time.time() + 60 * 10)
+		return -1 if js['result'] == 'Error' else js['session_token']
 
 	def __get_version_actual(self):
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_VERSION)
