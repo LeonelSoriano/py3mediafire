@@ -10,6 +10,8 @@ class BaseUrlMediaFire(object):
 	RENEW_SESSION_TOKEN_USER = ('http://www.mediafire.com/api/user/'
 		'renew_session_token.php')
 
+	GET_LOGIN_TOKEN_USER = 'https://www.mediafire.com/api/user/get_login_token.php'
+
 	MYFILES_REVISION_USER = 'http://www.mediafire.com/api/user/myfiles_revision.php'
 
 	#terminos de servicios he informacion de ellos

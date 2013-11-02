@@ -8,7 +8,6 @@ import json
 
 class WapperUrl(object):
 	def get_json_mediafire(self, url, dic_param = {} ):
-		
 		dic_param['response_format'] = 'json'
 		post = urllib.parse.urlencode(dic_param)
 		post_binary = post.encode('UTF-8')
@@ -17,8 +16,8 @@ class WapperUrl(object):
 			print(e)
 			return json.loads('{"result":"Error"}')
 		json_response = response.readall().decode('UTF-8')
-		try: a = json.loads(json_response)['response']
+		try: json_response = json.loads(json_response)['response']
 		except ValueError:
 			#sys.stderr.write('Decoding JSON has failed in url \n\t' + url + '\n\n')
 			return json.loads('{"result":"Error"}')
-		return a
+		return json_response
