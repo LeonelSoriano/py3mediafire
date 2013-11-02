@@ -19,9 +19,10 @@ class SessionHandler(WapperUrl):
 		self.signature = self.__email + self.__password + self.__application_id + api_key
 		self.sha1_encode = hashlib.sha1(self.signature.encode()).hexdigest()
 		self.expires_session = 0
-		self.session_token = self.__user_getSessionToken()
+		self.__session_token = self.__user_get_session_token()
+		print(self.get_token())
 
-	def __user_getSessionToken(self):
+	def __user_get_session_token(self):
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_SESSION_TOKEN_USER,
 			{'email': self.__email, 'password': self.__password, 'application_id': self.__application_id,
 			'signature': self.sha1_encode, 'version': self.__version})
@@ -30,7 +31,7 @@ class SessionHandler(WapperUrl):
 
 	def __user_renew_session_token(self):
 		js = self.get_json_mediafire(BaseUrlMediaFire.RENEW_SESSION_TOKEN_USER,
-			{'session_token': self.session_token,  'version': self.__version})
+			{'session_token': self.__session_token,  'version': self.__version})
 		self.expires_session = int(time.time())
 		return 1 if js['result'] == 'Error' else js['session_token']
 
@@ -39,6 +40,18 @@ class SessionHandler(WapperUrl):
 			{'email': self.__email, 'password': self.__password, 'application_id': self.__application_id,
 			'signature': self.sha1_encode,  'version': self.__version})
 		return 1 if js['result'] == 'Error' else js['session_token']
+
+	def get_token(self):
+		actual_time = int(time.time())
+		if(actual_time < self.expires_session + 60 * 5):
+			return self.__session_token
+		elif(actual_time >= self.expires_session + 60 * 5 or
+			actual_time < self.expires_session + 60 * 10):
+			self.session_token = self.__user_renew_session_token()
+			return self.session_token
+		elif(actual_time >= self.expires_session + 60 * 10):
+			self.session_token = __user_get_session_token
+			return self.session_token
 
 	def __get_version_actual(self):
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_VERSION)
