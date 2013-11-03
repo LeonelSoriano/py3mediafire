@@ -22,6 +22,7 @@ class BaseUrlMediaFire(object):
 	ACCEPT_TOS_USER = 'http://www.mediafire.com/api/user/accept_tos.php'
 
 	GET_INFO_USER = 'http://www.mediafire.com/api/user/get_info.php'
+	SET_INFO_USER = 'http://www.mediafire.com/api/user/update.php'
 
 	#FILES
 	DELETE_FILE = 'http://www.mediafire.com/api/file/delete.php'

@@ -18,6 +18,6 @@ class WapperUrl(object):
 		json_response = response.readall().decode('UTF-8')
 		try: json_response = json.loads(json_response)['response']
 		except ValueError:
-			#sys.stderr.write('Decoding JSON has failed in url \n\t' + url + '\n\n')
+			sys.stderr.write('Decoding JSON has failed in url \n\t' + url + '\n\n')
 			return json.loads('{"result":"Error"}')
 		return json_response
