@@ -11,8 +11,6 @@ class UserOperation(WapperUrl):
 	"""
 	def __init__(self,ref_session):
 		self.__session_token = ref_session
-		self.accept_terms_service()
-
 
 	def get_info(self):
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_INFO_USER,
