@@ -45,8 +45,8 @@ class BaseUrlMediaFire(object):
 		'configure_one_time_download.php')
 
 	#folder
-	GET_INFO_FOLDER = 'http://www.mediafire.com/api/folder/get_info.php'
-
+	GET_INFO_FILE = ' http://www.mediafire.com/api/file/get_info.php'
+	#TODO agregar deneuvo get folder info
 	DELETE_FOLDER = 'http://www.mediafire.com/api/folder/delete.php'
 
 	MOVE_FOLDER = 'http://www.mediafire.com/api/folder/move.php'
