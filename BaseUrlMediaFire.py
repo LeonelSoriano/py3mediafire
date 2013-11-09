@@ -89,7 +89,6 @@ class BaseUrlMediaFire(object):
 	#complete uploade
 	POLL_UPLOAD = 'http://www.mediafire.com/api/upload/poll_upload.php'
 
-	DIRECT_DOWNLOAD_LINK = 'http://www.mediafire.com/api/file/get_links.php'
 	GET_VERSION = 'http://www.mediafire.com/api/system/get_version.php'
 	GET_INFO_SYSTEM = 'http://www.mediafire.com/api/system/get_info.php'
 	GET_SUPPORTED_MEDIA = ('http://www.mediafire.com/api/system/'

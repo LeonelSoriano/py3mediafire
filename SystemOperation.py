@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 # -*- Mode: Python; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- #
 from py3mediafire.WapperUrl import WapperUrl
 from py3mediafire.BaseUrlMediaFire import BaseUrlMediaFire
@@ -7,16 +7,17 @@ class SystemOperation(WapperUrl):
 	def __init__(self,ref_session):
 		self.__session_token = ref_session
 		#folder key mq10rijd8mora
-		reps = self.search('focus.rar')
-		for a in range(len(reps)):
-			print(reps[a])
-			print('--------------------------------------------------------')
-		self.copy_file('d75pi6ngg2ss38i')
-		#self.get_info_file('heeev7tem9jt87w')
-		#self.update_file('4b9aqox53bm169a',{'filename': 'foto.png'})
+		#self.cut_file('ovlaabbb6pth3ja')
+		#print(self.search('focus.rar')[0])
+#		for a in range(len(reps)):
+#			#print(reps[a])
+#			print('--------------------------------------------------------')
+#		print('--------------------------------------------------------')
+		print(self.get_links('ovlaabbb6pth3ja', 'normal_download'))
 
 
 	def get_content(self):
+		""" Return either a list of folders or a list of files."""
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_CONTENT_FOLDER,
 		{'session_token': self.__session_token.get_token(),
 			'version': self.__session_token.get_version_actual()})
@@ -86,6 +87,16 @@ class SystemOperation(WapperUrl):
 			option['folder_key'] = folder_key
 		js = self.get_json_mediafire(BaseUrlMediaFire.SEARCH_FOLDER ,option)
 		return js['results']
+
+	def perfect_search(self, search_text, option = {}, folder_key = None):
+		result = self.search(search_text, option, folder_key)
+		if(folder_key == None):
+			folder_key = ''
+		if(len(result) == 1):
+			if(result[0]['filename'] == search_text and
+				result[0]['parent_folderkey'] == folder_key):
+				return result[0]
+		return {'result': 'different'}
 
 	def get_info_file(self, quick_key):
 		option = {}
@@ -171,6 +182,18 @@ class SystemOperation(WapperUrl):
 #			print(str(js) + " SystemOperation::change_quickkey")
 
 	def copy_file(self, quick_key, folder_key = None):
+		""" Copy a file to a specified folder. Any file can be copied whether it belongs to
+		the session user or another user. However, the target folder must be owned by
+		the session caller. Private files not owned by the session caller cannot be copied.
+
+		Keyword arguments:
+			quick_key -- The quickkey or a list of quickkeys that identify the files to be saved
+			folder_key -- The key that identifies the destination folder. If omitted, the
+				destination folder will be the root folder (My files) (defaul None)
+
+		Return:
+			new_quickkeys -- new quick_key of new file
+		"""
 		option = {}
 		option['session_token'] = self.__session_token.get_token()
 		option['quick_key'] = quick_key
@@ -179,10 +202,45 @@ class SystemOperation(WapperUrl):
 		option['version'] = self.__session_token.get_version_actual()
 		js = self.get_json_mediafire(BaseUrlMediaFire.COPY_FILE, option)
 		if (not __debug__):
-			print(str(js) + " SystemOperation::copy_file")
+			print(str(js) + " SystemOperation::copy_file")  
+		return js['new_quickkeys'][0]
 
+	def copy_and_rename_file(self, new_name, quickkey, folder_key = None):
+		ls = self.perfect_search(new_name,folder_key=folder_key)
+		if(ls.get('result') == None):
+			new_quickkeys = self.copy_file(quickkey, folder_key)
+			self.update_file(new_quickkeys,{'filename':new_name})
 
-
+	def cut_file(self,quickkey, folder_key = None): 
+		self.copy_file(quickkey, folder_key)
+		self.delete_file(quickkey)
+		
+	def get_links(self,quick_key, link_tipe = ''):
+		"""Returns a list containing the view link, normal download link, and
+		if possible the direct download link of a file. If the direct download
+		link is not returned, an error message is returned explaining the reason
+		
+		Keyword arguments:
+			quick_key -- The quickkey that identifies the file
+			
+			link_type : specify which link type is to be returned. If not 
+				passed, all link types are returned. Values: 'view', 'edit',
+				'normal_download', 'direct_download', 'one_time_download.' With
+				the direct_download link, users have a free daily bandwidth of
+				50 GB.(defaul '') 
+			
+		
+		Return:
+			{} -- normal_download, edit, direct_download, quickkey, 
+				one_time_download
+		"""
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_LINKS_FILE, 
+			{'session_token': self.__session_token.get_token(),
+			'quick_key': quick_key,
+			'link_type': link_tipe,
+			'version': self.__session_token.get_version_actual()})
+		return js['links'][0]
+		
 
 
 
