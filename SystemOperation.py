@@ -7,12 +7,13 @@ class SystemOperation(WapperUrl):
 	def __init__(self,ref_session):
 		self.__session_token = ref_session
 		#folder key mq10rijd8mora
-		#reps = self.search('prueba',{})
-		#for a in range(len(reps)):
-		#	print(reps[a])
-		#	print('--------------------------------------------------------')
+		reps = self.search('focus.rar')
+		for a in range(len(reps)):
+			print(reps[a])
+			print('--------------------------------------------------------')
+		self.copy_file('d75pi6ngg2ss38i')
 		#self.get_info_file('heeev7tem9jt87w')
-		#09kt0xm7qvo673b
+		#self.update_file('4b9aqox53bm169a',{'filename': 'foto.png'})
 
 
 	def get_content(self):
@@ -113,7 +114,75 @@ class SystemOperation(WapperUrl):
 		option['version'] = self.__session_token.get_version_actual()
 		js = self.get_json_mediafire(BaseUrlMediaFire.MOVE_FILE, option)
 		if (not __debug__):
-			print(js)
+			print(str(js) + " SystemOperation::move_file")
 
-	def update_file(self, quick_key):
-		pass
+	def update_file(self, quick_key, option = {}):
+		"""Update a file's information
+
+		Keyword arguments:
+			quick_key --  The quickkey that identifies the file
+			option -- {} (defaul {})
+				filename : The Name of the file (Should have same file type as the old file)
+					The filename should be 3 to 255 in length
+				description : The description of the file
+				tags : A space-separated list of tags
+				privacy : Privacy of the file ('public' or 'private')
+				timezone : The code of the local timezone of the user.
+		"""
+		option['session_token'] = self.__session_token.get_token()
+		option['quick_key'] = quick_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.UPDATE_FILE, option)
+		if (not __debug__):
+			print(str(js) + " SystemOperation::update_file")
+
+	def update_password_file(self, quick_key, password):
+		"""Update a file's password
+		
+		Keyword arguments:
+			quick_key -- The quickkey that identifies the file
+			password -- The new password to be set. To remove the password protection,
+				pass an empty string
+		"""
+		js = self.get_json_mediafire(BaseUrlMediaFire.UPDATE_PASSWORD_FILE,
+			{'session_token': self.__session_token.get_token(),
+			'quick_key': quick_key,
+			'password': password,
+			'version': self.__session_token.get_version_actual()})
+		if (not __debug__):
+			print(str(js) + " SystemOperation::update_password")
+
+#TODO
+#	def change_quickkey(self, from_quickkey, to_quickkey):
+#		"""Update a file's quickkey with another file's quickkey
+#		Note: Only files with the same file extension can be used with this operation
+#
+#		Keyword arguments:
+#			from_quickkey : The quickkey of the file to be overridden. After this operation,
+#				this quickkey will be invalid
+#			to_quickkey : The new quickkey that will point to the file previously identified
+#				by from_quickkey.
+#		"""
+#		js = self.get_json_mediafire('http://www.mediafire.com/api/file/update_file.php',
+#		{'session_token': self.__session_token.get_token(),
+#		'from_quickkey': 'd75pi6ngg2ss38i',
+#		'to_quickkey': 'atdfgt456ds2r6'})
+#		if (not __debug__):
+#			print(str(js) + " SystemOperation::change_quickkey")
+
+	def copy_file(self, quick_key, folder_key = None):
+		option = {}
+		option['session_token'] = self.__session_token.get_token()
+		option['quick_key'] = quick_key
+		if(folder_key is not None):
+			option['folder_key'] = folder_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.COPY_FILE, option)
+		if (not __debug__):
+			print(str(js) + " SystemOperation::copy_file")
+
+
+
+
+
+

@@ -5,6 +5,7 @@
 
 class BaseUrlMediaFire(object):
 
+
 	GET_SESSION_TOKEN_USER = 'https://www.mediafire.com/api/user/get_session_token.php'
 
 	RENEW_SESSION_TOKEN_USER = ('http://www.mediafire.com/api/user/'
@@ -33,7 +34,7 @@ class BaseUrlMediaFire(object):
 
 	UPDATE_PASSWORD_FILE = 'http://www.mediafire.com/api/file/update_password.php'
 
-	UPDATE_FILE = 'http://www.mediafire.com/api/file/update_file.php'
+	UPDATE_QUICKKEY = 'http://www.mediafire.com/api/file/update_file.php'
 
 	COPY_FILE = 'http://www.mediafire.com/api/file/copy.php'
 

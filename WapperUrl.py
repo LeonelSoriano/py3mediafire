@@ -6,6 +6,7 @@ from urllib.request import urlopen
 import urllib.parse
 import json
 
+
 class WapperUrl(object):
 	def get_json_mediafire(self, url, dic_param = {} ):
 		dic_param['response_format'] = 'json'
