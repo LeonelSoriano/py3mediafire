@@ -13,7 +13,10 @@ class SystemOperation(WapperUrl):
 #			#print(reps[a])
 #			print('--------------------------------------------------------')
 #		print('--------------------------------------------------------')
-		print(self.get_links('ovlaabbb6pth3ja', 'normal_download'))
+#'ovlaabbb6pth3ja'
+		original = self.search('ramon')[0]['folderkey']
+		move = self.search('julia')[0]['folderkey']
+		self.move_folder(original, move)
 
 
 	def get_content(self):
@@ -103,7 +106,7 @@ class SystemOperation(WapperUrl):
 		option['quick_key'] = quick_key
 		option['session_token'] = self.__session_token.get_token()
 		option['version'] = self.__session_token.get_version_actual()
-		js = self.get_json_mediafire(BaseUrlMediaFire.GET_INFO_FILE,option)
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_INFO_FILE, option)
 		if(js.get('result') == 'Error' and  not __debug__):
 			print('Error in SystemOperation:get_info_file')
 		return js['file_info']
@@ -240,7 +243,54 @@ class SystemOperation(WapperUrl):
 			'link_type': link_tipe,
 			'version': self.__session_token.get_version_actual()})
 		return js['links'][0]
-		
+
+	def one_time_download (self, quick_key, option = {}):
+		option['session_token'] = self.__session_token.get_token()
+		option['version'] = self.__session_token.get_version_actual()
+		option['quick_key'] = quick_key
+		js = self.get_json_mediafire(BaseUrlMediaFire.ONE_TIME_DOWNLOAD_FILE,
+			option)
+		return js
+
+	def configure_one_time_download(self, token, option = {}):
+		option['session_token'] = self.__session_token.get_token()
+		option['version'] = self.__session_token.get_version_actual()
+		option['token'] = token
+		js = self.get_json_mediafire(
+			BaseUrlMediaFire.CONFIGURE_ONE_TIME_DOWNLOAD_FILE, option)
+		if not __debug__:
+			print(str(js) + " SystemOperation::update_password")
+		return js
+
+	def get_info_folder(self, folder_key = None, option = {}):
+		if(folder_key == None):
+			option['session_token'] = self.__session_token.get_token()
+		else:
+			option['folder_key'] = folder_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_INFO_FOLDER, option)
+		return js['folder_info']
+
+	def delete_folder(self, folder_key):
+		js = self.get_json_mediafire(BaseUrlMediaFire.DELETE_FOLDER,
+		{'session_token': self.__session_token.get_token(),
+		'folder_key': folder_key,
+		'version': self.__session_token.get_version_actual()})
+		if not __debug__:
+			print(str(js) + " SystemOperation::delete_folder")
+		return js
+
+	def move_folder(self, folder_key_src, folder_key_dst = None):
+		option = {}
+		option['session_token'] = self.__session_token.get_token()
+		option['folder_key_src'] = folder_key_src
+		if(folder_key_dst != None):
+			option['folder_key_dst'] = folder_key_dst
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.MOVE_FOLDER, option)
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::move_folder')
+		return js
 
 
 

@@ -47,7 +47,9 @@ class BaseUrlMediaFire(object):
 
 	#folder
 	GET_INFO_FILE = ' http://www.mediafire.com/api/file/get_info.php'
-	#TODO agregar deneuvo get folder info
+
+	GET_INFO_FOLDER = 'http://www.mediafire.com/api/folder/get_info.php'
+
 	DELETE_FOLDER = 'http://www.mediafire.com/api/folder/delete.php'
 
 	MOVE_FOLDER = 'http://www.mediafire.com/api/folder/move.php'
