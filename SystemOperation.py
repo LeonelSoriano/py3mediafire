@@ -12,17 +12,15 @@ class SystemOperation(WapperUrl):
 #		for a in range(len(reps)):
 #			#print(reps[a])
 #			print('--------------------------------------------------------')
-#		print('--------------------------------------------------------')
 #'ovlaabbb6pth3ja'
-		original = self.search('ramon')[0]['folderkey']
-		move = self.search('julia')[0]['folderkey']
-		self.move_folder(original, move)
-
+		original = self.search('Perro')[0]['folderkey']
+		print(original)
+		print(self.get_revision_folder(original))
 
 	def get_content(self):
 		""" Return either a list of folders or a list of files."""
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_CONTENT_FOLDER,
-		{'session_token': self.__session_token.get_token(),
+			{'session_token': self.__session_token.get_token(),
 			'version': self.__session_token.get_version_actual()})
 		return js
 
@@ -291,6 +289,63 @@ class SystemOperation(WapperUrl):
 		if(not __debug__):
 			print(str(js) + 'SystemOperation::move_folder')
 		return js
+
+	def create_folder(self, foldername, option = {}):
+		option['session_token'] = self.__session_token.get_token()
+		option['foldername'] = foldername
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.CREATE_FOLDER, option)
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::create_folder')
+		return js
+
+	def update_folder(self, folder_key, option = {}):
+		option['session_token'] = self.__session_token.get_token()
+		option['folder_key'] = folder_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.UPDATE_FOLDER, option)
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::update_folder')
+		return js
+
+	def rename_folder(self, folder_key, foldername):
+		js = self.get_json_mediafire(BaseUrlMediaFire.UPDATE_FOLDER,
+			{'foldername': foldername,
+			'session_token' : self.__session_token.get_token(),
+			'version': self.__session_token.get_version_actual(),
+			'folder_key': folder_key})
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::rename_folder')
+		return js
+
+	#TODO return access deneged 403 (bug)
+	def attach_foreign(self, folder_keys):
+		option = {}
+		option['session_token'] = self.__session_token.get_token()
+		option['folder_key'] = folder_keys
+		js = self.get_json_mediafire(BaseUrlMediaFire.ATTACH_FOREIGN_FOLDER,option)
+		return js
+
+	#TODO return access deneged 403 (bug)
+	def detach_foreign(self, folder_key):
+		option = {}
+		option['session_token'] = self.__session_token()
+		option['folder_key'] = folder_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.DETACH_FOREIGN_FOLDER,
+			option)
+		return js
+
+	def get_revision_folder(self, folder_key):
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_REVISION_FOLDER,
+			{'session_token': self.__session_token.get_version_actual(),
+			'folder_key': folder_key,
+			'version': self.__session_token.get_version_actual()})
+		return js
+
+
+
+
 
 
 

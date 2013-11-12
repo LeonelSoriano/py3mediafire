@@ -74,4 +74,3 @@ class SessionHandler(WapperUrl):
 			return 1 if js['result'] == 'Error' else js['current_api_version']
 		else:
 			return self.__version
-
