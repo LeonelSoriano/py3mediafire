@@ -15,7 +15,7 @@ class SystemOperation(WapperUrl):
 #'ovlaabbb6pth3ja'
 		original = self.search('torituga')[0]['folderkey']
 		print(original)
-		print(self.get_depth_folder(original))
+		print(self.get_siblings(original))
 
 	def get_content(self):
 		""" Return either a list of folders or a list of files."""
@@ -352,6 +352,18 @@ class SystemOperation(WapperUrl):
 		if(not __debug__):
 			print(str(js) + 'SystemOperation::get_revision_folder')
 		return js['folder_depth']
+
+	def get_siblings (self, folder_key, option = {}):
+		print(self.__session_token.get_token())
+		option['session_token'] = self.__session_token.get_token()
+		option['folder_key'] = folder_key
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_SIBLINGS_FOLDER,option)
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::get_siblings')
+		return js
+
+	
 
 
 
