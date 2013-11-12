@@ -13,9 +13,9 @@ class SystemOperation(WapperUrl):
 #			#print(reps[a])
 #			print('--------------------------------------------------------')
 #'ovlaabbb6pth3ja'
-		original = self.search('Perro')[0]['folderkey']
+		original = self.search('torituga')[0]['folderkey']
 		print(original)
-		print(self.get_revision_folder(original))
+		print(self.get_depth_folder(original))
 
 	def get_content(self):
 		""" Return either a list of folders or a list of files."""
@@ -329,7 +329,7 @@ class SystemOperation(WapperUrl):
 	#TODO return access deneged 403 (bug)
 	def detach_foreign(self, folder_key):
 		option = {}
-		option['session_token'] = self.__session_token()
+		option['session_token'] = self.__session_token.get_token()
 		option['folder_key'] = folder_key
 		option['version'] = self.__session_token.get_version_actual()
 		js = self.get_json_mediafire(BaseUrlMediaFire.DETACH_FOREIGN_FOLDER,
@@ -338,12 +338,20 @@ class SystemOperation(WapperUrl):
 
 	def get_revision_folder(self, folder_key):
 		js = self.get_json_mediafire(BaseUrlMediaFire.GET_REVISION_FOLDER,
-			{'session_token': self.__session_token.get_version_actual(),
+			{'session_token':  self.__session_token.get_token(),
 			'folder_key': folder_key,
-			'version': self.__session_token.get_version_actual()})
+			'version': self.__session_token.get_version_actual(),
+			'return_changes': 'yes'})
 		return js
 
-
+	def  get_depth_folder(self, folder_key):
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_DEPTH_FOLDER,
+			{'session_token': self.__session_token.get_token(),
+			'folder_key': folder_key,
+			'version': self.__session_token.get_version_actual()})
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::get_revision_folder')
+		return js['folder_depth']
 
 
 
