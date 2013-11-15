@@ -1,5 +1,15 @@
  # -*- coding: utf-8 -*-
 # -*- Mode: Python; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- #
+import hashlib
+import os
+import mimetypes
+import urllib.parse
+import urllib.request
+import io
+import itertools
+import mimetypes
+import json
+import email.generator
 from py3mediafire.WapperUrl import WapperUrl
 from py3mediafire.BaseUrlMediaFire import BaseUrlMediaFire
 
@@ -14,8 +24,7 @@ class SystemOperation(WapperUrl):
 #			print('--------------------------------------------------------')
 #'ovlaabbb6pth3ja'
 		original = self.search('torituga')[0]['folderkey']
-		print(original)
-		print(self.get_siblings(original))
+		#print(self.upload('leonel.jpg'))
 
 	def get_content(self):
 		""" Return either a list of folders or a list of files."""
@@ -125,7 +134,7 @@ class SystemOperation(WapperUrl):
 			option['folder_key'] = folder_key
 		option['version'] = self.__session_token.get_version_actual()
 		js = self.get_json_mediafire(BaseUrlMediaFire.MOVE_FILE, option)
-		if (not __debug__):
+		if (not __debug__): 
 			print(str(js) + " SystemOperation::move_file")
 
 	def update_file(self, quick_key, option = {}):
@@ -363,7 +372,130 @@ class SystemOperation(WapperUrl):
 			print(str(js) + 'SystemOperation::get_siblings')
 		return js
 
-	
+	def pre_upload(self, filename, option = {}):
+		option['session_token'] = self.__session_token.get_token()
+		option['version'] = self.__session_token.get_version_actual()
+		option['filename'] = filename
+		js = self.get_json_mediafire(BaseUrlMediaFire.PRE_UPLOAD, option)
+		return js
+		
+
+	def upload(self, filename, option = {}):
+		user_agent = ('Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en; rv:2.0) '
+			'Gecko/25250101 Netscape/5.432b1 (C-MindSpring)')
+
+		option['session_token'] = self.__session_token.get_token()
+		option['version'] = self.__session_token.get_version_actual()
+		option['response_format'] = 'json'
+		
+		get = urllib.parse.urlencode(option)
+		fp = open(filename,'rb')
+		form = MultiPartForm()
+		form.add_file('fileUpload', filename, fileHandle=fp)
+
+		form.make_result()
+		url = BaseUrlMediaFire.UPLOAD + '?' + get
+		req1 = urllib.request.Request(url)
+		req1.add_header('User-Agent', user_agent,)
+		req1.add_header('Content-type', form.get_content_type())
+		req1.add_header('Content-length', len(form.form_data))
+		req1.add_data(form.form_data)
+
+		fp.close()
+		try: response = urllib.request.urlopen(req1)
+		except urllib.error.URLError as e:
+			print(e)
+			return json.loads('{"result":"Error"}')
+		json_response = response.readall().decode('UTF-8')
+		try: json_response = json.loads(json_response)['response']
+		except ValueError:
+			sys.stderr.write('Decoding JSON has failed in url \n\t' + url + '\n\n')
+			return  json.loads(json_response)
+		return json_response
+
+	def poll_upload(self, key):
+		js = self.get_json_mediafire(BaseUrlMediaFire.POLL_UPLOAD,
+			{'key': key,
+			'session_token' : self.__session_token.get_token(),
+			'version': self.__session_token.get_version_actual()})
+		if(not __debug__):
+			print(str(js) + 'SystemOperation::poll_upload')
+		return js
+
+
+"""
+Doug Hellmann's urllib2, translated to python3.
+"""
+class MultiPartForm():
+	"""Accumulate the data to be used when posting a form."""
+
+	def __init__(self):
+		self.form_fields = []
+		self.files = []
+		self.form_data = None
+		self.boundary = email.generator._make_boundary()
+		return
+
+	def get_content_type(self):
+		return 'multipart/form-data; boundary=%s' % self.boundary
+
+	def add_field(self, name, value):
+		"""Add a simple field to the form data."""
+		self.form_fields.append((name, value))
+		return
+
+	def add_file(self, fieldname, filename, fileHandle, mimetype=None):
+		"""Add a file to be uploaded."""
+		body = fileHandle.read()
+		if mimetype is None:
+			mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+		self.files.append((fieldname, filename, mimetype, body))
+		return
+
+	def make_result(self):
+		"""Return bytes representing the form data, including attached files."""
+        # Build a list of lists, each containing "lines" of the
+        # request. Each part is separated by a boundary string.
+        # Once the list is built, return a string where each
+        # line is separated by '\r\n'.
+		parts = []
+		part_boundary = '--' + self.boundary
+
+        # Add the form fields
+		parts.extend(
+			[ bytes(part_boundary, 'utf-8'),
+			bytes('Content-Disposition: form-data; name="%s"' % name, 'utf-8'),
+			b'',
+			bytes(value, 'utf-8'),
+			]
+			for name, value in self.form_fields
+			)
+
+        # Add the files to upload
+		parts.extend(
+			[ bytes(part_boundary, 'utf-8'),
+			bytes('Content-Disposition: file; name="%s"; filename="%s"' % (field_name, filename), 'utf-8'),
+			bytes('Content-Type: %s' % content_type, 'utf-8'),
+			b'',
+			body,
+			]
+			for field_name, filename, content_type, body in self.files
+			)
+
+        # Flatten the list and add closing boundary marker,
+        # then return CR+LF separated data
+		flattened = list(itertools.chain(*parts))
+		flattened.append(bytes('--' + self.boundary + '--', 'utf-8'))
+		flattened.append(b'')
+		self.form_data = b'\r\n'.join(flattened)
+
+	#def __str__(self):
+		#return str({'self.form_fields': self.form_fields, 'self.files': '{} pieces'.format(len(self.files)), 'self.boundary': self.boundary})
+
+    # def __repr__(self):
+    # return str({'self.form_fields': self.form_fields, 'self.files': '{} pieces'.format(len(self.files)), 'self.boundary': self.boundary})
+        
+
 
 
 

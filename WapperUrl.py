@@ -5,7 +5,7 @@ import hashlib
 from urllib.request import urlopen
 import urllib.parse
 import json
-
+	
 
 class WapperUrl(object):
 	def get_json_mediafire(self, url, dic_param = {} ):
@@ -20,5 +20,5 @@ class WapperUrl(object):
 		try: json_response = json.loads(json_response)['response']
 		except ValueError:
 			sys.stderr.write('Decoding JSON has failed in url \n\t' + url + '\n\n')
-			return json.loads('{"result":"Error"}')
+			return  json.loads(json_response)
 		return json_response
