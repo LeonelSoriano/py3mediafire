@@ -13,18 +13,15 @@ import email.generator
 from py3mediafire.WapperUrl import WapperUrl
 from py3mediafire.BaseUrlMediaFire import BaseUrlMediaFire
 
+#TODO add Resumable Uploads
 class SystemOperation(WapperUrl):
 	def __init__(self,ref_session):
 		self.__session_token = ref_session
-		#folder key mq10rijd8mora
-		#self.cut_file('ovlaabbb6pth3ja')
-		#print(self.search('focus.rar')[0])
+
 #		for a in range(len(reps)):
 #			#print(reps[a])
-#			print('--------------------------------------------------------')
-#'ovlaabbb6pth3ja'
-		original = self.search('torituga')[0]['folderkey']
-		#print(self.upload('leonel.jpg'))
+		self.get_mime_types()
+
 
 	def get_content(self):
 		""" Return either a list of folders or a list of files."""
@@ -420,6 +417,54 @@ class SystemOperation(WapperUrl):
 			'version': self.__session_token.get_version_actual()})
 		if(not __debug__):
 			print(str(js) + 'SystemOperation::poll_upload')
+		return js
+
+	def download(self, quick_key,new_name = None):
+		extension = ''
+		js_link = self.get_links(quick_key, 'direct_download')
+		if(js_link['quickkey'] == ''):
+			if(not __debug__):
+				print('Error en descarga en SystemOperation::download')
+			return {'result': 'Error'}
+		tmp_name = js_link['direct_download'].split('/')
+		name_file = tmp_name[len(tmp_name)-1]
+
+		if(new_name != None):
+			while(name_file.find('.') > 0):
+				name_file, tmp = os.path.splitext(name_file)
+				extension = tmp + extension
+			new_name = new_name.replace('.','')
+			name_file = new_name + extension
+			print(name_file)
+		response = urllib.request.urlopen(js_link['direct_download'])
+		with open(name_file, 'b+w') as f:
+			f.write(response.read())
+		return {'result': 'Success'}
+
+	def get_info_system(self):
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_INFO_SYSTEM,
+			{'version': self.__session_token.get_version_actual()})
+		return js
+
+	def get_supported_media(self, group_by_filetype = False):
+		option = {}
+		if(group_by_filetype == True):
+			option['group_by_filetype'] = 'yes'
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_SUPPORTED_MEDIA, option)
+		return js
+
+	def get_editable_media(self, group_by_filetype = False):
+		option = {}
+		if(group_by_filetype == True):
+			option['group_by_filetype'] = 'yes'
+		option['version'] = self.__session_token.get_version_actual()
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_EDITABLE_MEDIA, option)
+		print(js)
+
+	def get_mime_types(self):
+		js = self.get_json_mediafire(BaseUrlMediaFire.GET_MIME_TYPES,
+			{'version': self.__session_token.get_version_actual()})
 		return js
 
 
