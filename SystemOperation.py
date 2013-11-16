@@ -91,13 +91,23 @@ class SystemOperation(WapperUrl):
 		js = self.get_json_mediafire(BaseUrlMediaFire.SEARCH_FOLDER ,option)
 		return js['results']
 
-	def perfect_search(self, search_text, option = {}, folder_key = None):
+	def perfect_search_file(self, search_text, option = {}, folder_key = None):
 		result = self.search(search_text, option, folder_key)
 		if(folder_key == None):
 			folder_key = ''
 		if(len(result) == 1):
-			if(result[0]['filename'] == search_text and
-				result[0]['parent_folderkey'] == folder_key):
+			if(result[0].get('filename') == search_text and
+				result[0].get('parent_folderkey') == folder_key):
+				return result[0]
+		return {'result': 'different'}
+
+	def perfect_search_folder(self, search_text, option = {}, folder_key = None):
+		result = self.search(search_text, option, folder_key)
+		if(folder_key == None):
+			folder_key = ''
+		if(len(result) == 1):
+			if(result[0].get('name') == search_text and
+				result[0].get('parent_folderkey') == folder_key):
 				return result[0]
 		return {'result': 'different'}
 
